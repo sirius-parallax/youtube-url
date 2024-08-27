@@ -1,0 +1,39 @@
+# Загрузка файла с GitHub
+:log info "Starting file download from GitHub..."
+/tool fetch url="https://raw.githubusercontent.com/sirius-parallax/youtube-url/main/script_generate_mikrotik/youtube-url.rsc" mode=https dst-path="youtube-url.rsc"
+
+# Задержка для завершения загрузки
+:delay 5s
+
+# Проверка успешности загрузки
+:if ([:len [/file find name="youtube-url.rsc"]] > 0) do={
+    :log info "File youtube-url.rsc downloaded successfully."
+
+    # Проверка содержимого файла
+    :local fileContent [/file get [find name="youtube-url.rsc"] contents]
+    :log info ("File contents: " . [:pick $fileContent 0 100]) # Печатает первые 100 символов содержимого файла
+
+    # Удаление старого списка адресов, если комментарий совпадает
+    :log info "Removing old address list entries with comment 'YouTube'..."
+    /ip firewall address-list remove [find where comment="YouTube"]
+
+    # Импорт нового файла
+    :log info "Importing new file..."
+    /import file-name="youtube-url.rsc"
+
+    # Задержка для завершения импорта
+    :delay 10s
+
+    :log info "File youtube-url.rsc imported successfully."
+} else={
+    :log error "Failed to download youtube-url.rsc from https://raw.githubusercontent.com/sirius-parallax/youtube-url/main/script_generate_mikrotik/youtube-url.rsc."
+}
+
+# Проверка статуса после импорта
+:log info "Checking file status..."
+:local importedFile [/file find name="youtube-url.rsc"]
+:if ($importedFile) do={
+    :log info "File exists after import check."
+} else={
+    :log error "File does not exist after import check."
+}
