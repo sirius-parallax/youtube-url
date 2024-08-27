@@ -1,3 +1,4 @@
+# Загрузка сгенерированной строки для RouterOS. Протестированно на ROS 7.15
 # Загрузка файла с GitHub
 :log info "Starting file download from GitHub..."
 /tool fetch url="https://raw.githubusercontent.com/sirius-parallax/youtube-url/main/script_generate_mikrotik/youtube-url.rsc" mode=https dst-path="youtube-url.rsc"
