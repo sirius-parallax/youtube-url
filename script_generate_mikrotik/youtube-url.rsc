@@ -1,5 +1,4 @@
 /ip firewall address-list remove [find list="YouTube-URL"]
-/ip firewall address-list add list="YouTube-URL" address=0.0.0.0 comment="Placeholder entry"
 /ip firewall address-list add list="YouTube-URL" address="_domainkey.youtube.com"
 /ip firewall address-list add list="YouTube-URL" address="a.rtmp.youtube.com"
 /ip firewall address-list add list="YouTube-URL" address="a.rtmps.youtube.com"
