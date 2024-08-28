@@ -1,0 +1,36 @@
+# Рабоатет на ROS 7.15
+# Задаем переменные
+:local url "https://raw.githubusercontent.com/sirius-parallax/youtube-url/main/script_generate_mikrotik_ip/add_ip_to_mikrotik.rsc"
+:local fileName "add_ip_to_mikrotik.rsc"
+:local addressListName "You-Tube-IP"
+
+# Логируем начало процесса
+:log info "Начало обновления адресного списка $addressListName."
+
+# Удаляем старые записи из адресного списка
+/ip firewall address-list remove [find list=$addressListName]
+
+# Проверяем, существует ли файл и удаляем старый, если есть
+:if ([:len [/file find name=$fileName]] > 0) do={
+    /file remove [find name=$fileName]
+}
+
+# Скачиваем новый файл
+/ tool fetch url=$url dst-path=$fileName
+
+# Ждем немного, чтобы убедиться, что файл был полностью загружен
+:delay 5s
+
+# Проверка успешности загрузки файла
+:local fileExists [/file find name=$fileName]
+:if ([:len $fileExists] > 0) do={
+    # Импортируем новый файл
+    /import file-name=$fileName
+    
+    # Удаляем временный файл
+    /file remove [find name=$fileName]
+    
+    :log info "Обновление адресного списка $addressListName завершено."
+} else={
+    :log error "Ошибка: файл $fileName не был загружен."
+}
