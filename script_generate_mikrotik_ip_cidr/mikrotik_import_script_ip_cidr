@@ -1,0 +1,43 @@
+# ROS 7.15
+# Задаем переменные
+:local url "https://raw.githubusercontent.com/sirius-parallax/youtube-url/main/script_generate_mikrotik_ip_cidr/add_cidr_to_mikrotik.rsc"
+:local fileName "add_cidr_to_mikrotik.rsc"
+:local addressListName "You-Tube-IP-CIDR"
+
+# Логируем начало процесса
+:log info "Начало обновления адресного списка $addressListName."
+
+# Удаляем старые записи из адресного списка
+:log info "Удаление старых записей из адресного списка $addressListName."
+/ip firewall address-list remove [find list=$addressListName]
+
+# Проверяем, существует ли файл и удаляем старый, если есть
+:if ([:len [/file find name=$fileName]] > 0) do={
+    :log warning "Файл $fileName уже существует. Удаление существующего файла перед загрузкой."
+    /file remove [find name=$fileName]
+}
+
+# Скачиваем новый файл
+:log info "Загрузка файла $fileName с адресами."
+/tool fetch url=$url dst-path=$fileName
+
+# Ждем немного, чтобы убедиться, что файл был полностью загружен
+:delay 5s
+
+# Проверка успешности загрузки файла
+:local fileExists [/file find name=$fileName]
+:if ([:len $fileExists] > 0) do={
+    :log info "Файл $fileName успешно загружен."
+    
+    # Импортируем новый файл
+    :log info "Импорт адресов из файла $fileName."
+    /import file-name=$fileName
+    
+    # Удаляем временный файл
+    :log info "Удаление временного файла $fileName."
+    /file remove [find name=$fileName]
+    
+    :log info "Обновление адресного списка $addressListName завершено."
+} else={
+    :log error "Ошибка: файл $fileName не был загружен."
+}
