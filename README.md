@@ -33,5 +33,7 @@
 /routing table add disabled=no fib name=youtube
 Для  новой таблицы роутинга создаем маршрут по умолчанимю что бы трафик шел в ваш WG интерфейс. 
 /ip route add disabled=no dst-address=0.0.0.0/0 gateway=wireguard1 routing-table=youtube suppress-hw-offload=no
+Добавляем мой скрипт в скрипты микротика ну и потом настраиваем cron по желанию.
+
 Профит.
 
