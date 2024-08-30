@@ -27,12 +27,16 @@
 
 Настраиваем NAT если  конечно у вас ваша локалка не маршрутизируется  с вайше VPS
 /ip firewall nat add action=masquerade chain=srcnat out-interface=wireguard
+
 Ставим роутинг метку тому что ижет в наш адрес лист.
 /ip firewall mangle add action=mark-routing chain=prerouting dst-address-list=YouTube-URL new-routing-mark=youtube passthrough=yes
+
 Создаем таблицу для роутинга. (Сначала желательно таблицу создать что бы в мангле было какую роутинг метку ставить)
 /routing table add disabled=no fib name=youtube
+
 Для  новой таблицы роутинга создаем маршрут по умолчанимю что бы трафик шел в ваш WG интерфейс. 
 /ip route add disabled=no dst-address=0.0.0.0/0 gateway=wireguard1 routing-table=youtube suppress-hw-offload=no
+
 Добавляем мой скрипт в скрипты микротика ну и потом настраиваем cron по желанию.
 
 Профит.
