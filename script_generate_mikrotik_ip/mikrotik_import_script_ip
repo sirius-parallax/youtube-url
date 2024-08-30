@@ -1,36 +1,36 @@
-# Рабоатет на ROS 7.15
-# Задаем переменные
+# Raboatet na ROS 7.15
+# Zadaem peremennye
 :local url "https://raw.githubusercontent.com/sirius-parallax/youtube-url/main/script_generate_mikrotik_ip/add_ip_to_mikrotik.rsc"
 :local fileName "add_ip_to_mikrotik.rsc"
 :local addressListName "You-Tube-IP"
 
-# Логируем начало процесса
-:log info "Начало обновления адресного списка $addressListName."
+# Logiruem nachalo protsessa
+:log info "Nachalo obnovleniya adresnogo spiska $addressListName."
 
-# Удаляем старые записи из адресного списка
+# Udalyayem starye zapisi iz adresnogo spiska
 /ip firewall address-list remove [find list=$addressListName]
 
-# Проверяем, существует ли файл и удаляем старый, если есть
+# Proveryaem, sushchestvuet li fayl i udalyaem staryy, yesli est'
 :if ([:len [/file find name=$fileName]] > 0) do={
     /file remove [find name=$fileName]
 }
 
-# Скачиваем новый файл
+# Skachivayem novyy fayl
 / tool fetch url=$url dst-path=$fileName
 
-# Ждем немного, чтобы убедиться, что файл был полностью загружен
+# Zhdem nemnogo, chtoby ubeditsya, chto fayl byl polnost'yu zagruzhen
 :delay 5s
 
-# Проверка успешности загрузки файла
+# Proverka uspeshnosti zagruzki fayla
 :local fileExists [/file find name=$fileName]
 :if ([:len $fileExists] > 0) do={
-    # Импортируем новый файл
+    # Importiruem novyy fayl
     /import file-name=$fileName
     
-    # Удаляем временный файл
+    # Udalyayem vremennyy fayl
     /file remove [find name=$fileName]
     
-    :log info "Обновление адресного списка $addressListName завершено."
+    :log info "Obnovlenie adresnogo spiska $addressListName zaversheno."
 } else={
-    :log error "Ошибка: файл $fileName не был загружен."
+    :log error "Oshibka: fayl $fileName ne byl zagruzhen."
 }
