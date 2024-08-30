@@ -1,43 +1,42 @@
 # ROS 7.15
-# Задаем переменные
+# Zadaem peremennye
 :local url "https://raw.githubusercontent.com/sirius-parallax/youtube-url/main/script_generate_mikrotik_ip_cidr/add_cidr_to_mikrotik.rsc"
 :local fileName "add_cidr_to_mikrotik.rsc"
 
-# Логируем начало процесса
-:log info "Начало обновления адресного списка."
+# Logiruem nachalo protsessa
+:log info "Nachalo obnovleniya adresnogo spiska."
 
-# Удаляем старые записи из всех адресных списков
-:log info "Очистка всех адресных списков."
+# Udalyayem starye zapisi iz vsekh adresnykh spiskov
+:log info "Ochistka vsekh adresnykh spiskov."
 /ip firewall address-list remove [find]
 
-# Проверяем, существует ли файл и удаляем старый, если есть
+# Proveryaem, sushchestvuet li fayl i udalyaem staryy, yesli est'
 :if ([:len [/file find name=$fileName]] > 0) do={
-    :log warning "Файл $fileName уже существует. Удаление существующего файла перед загрузкой."
+    :log warning "Fayl $fileName uzhe sushchestvuet. Udaleniye sushchestvuyushchego fayla pered zagruzkoy."
     /file remove [find name=$fileName]
 }
 
-# Скачиваем новый файл
-:log info "Загрузка файла $fileName с адресами."
+# Skachivayem novyy fayl
+:log info "Zagruzka fayla $fileName s adresami."
 /tool fetch url=$url dst-path=$fileName
 
-# Ждем немного, чтобы убедиться, что файл был полностью загружен
+# Zhdem nemnogo, chtoby ubeditsya, chto fayl byl polnost'yu zagruzhen
 :delay 5s
 
-# Проверка успешности загрузки файла
+# Proverka uspeshnosti zagruzki fayla
 :local fileExists [/file find name=$fileName]
 :if ([:len $fileExists] > 0) do={
-    :log info "Файл $fileName успешно загружен."
+    :log info "Fayl $fileName uspeshno zagruzhen."
 
-    # Импортируем новый файл
-    :log info "Импорт адресов из файла $fileName."
+    # Importiruem novyy fayl
+    :log info "Import adresov iz fayla $fileName."
     /import file-name=$fileName
     
-    # Удаляем временный файл
-    :log info "Удаление временного файла $fileName."
+    # Udalyayem vremennyy fayl
+    :log info "Udalenie vremennogo fayla $fileName."
     /file remove [find name=$fileName]
     
-    :log info "Обновление адресных списков завершено."
+    :log info "Obnovlenie adresnykh spiskov zaversheno."
 } else={
-    :log error "Ошибка: файл $fileName не был загружен."
+    :log error "Oshibka: fayl $fileName ne byl zagruzhen."
 }
-
